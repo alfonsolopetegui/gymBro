@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -28,4 +29,6 @@ public class ClassEntity {
     @Column(name = "is_active", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean isActive;
 
+    @OneToMany(mappedBy = "classType", fetch = FetchType.LAZY)
+    private List<ScheduleEntity> schedules;
 }

@@ -1,4 +1,4 @@
-package com.myCompany.gymBro.controllers;
+package com.myCompany.gymBro.web.controllers;
 
 import com.myCompany.gymBro.service.TestService;
 import org.springframework.beans.factory.annotation.Autowired;

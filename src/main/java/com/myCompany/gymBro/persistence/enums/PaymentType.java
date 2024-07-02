@@ -1,4 +1,4 @@
-package com.myCompany.gymBro.persistence;
+package com.myCompany.gymBro.persistence.enums;
 
 public enum PaymentType {
     DAYLY,

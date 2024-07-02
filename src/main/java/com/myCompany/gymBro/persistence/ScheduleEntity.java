@@ -1,5 +1,6 @@
 package com.myCompany.gymBro.persistence;
 
+import com.myCompany.gymBro.persistence.enums.DayOfWeek;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

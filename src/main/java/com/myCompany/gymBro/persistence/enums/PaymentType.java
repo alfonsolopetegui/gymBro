@@ -1,7 +1,7 @@
 package com.myCompany.gymBro.persistence.enums;
 
 public enum PaymentType {
-    DAYLY,
+    DAILY,
     MONTHLY,
     ANUALLY
 }

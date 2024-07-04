@@ -1,4 +1,4 @@
-package com.myCompany.gymBro.persistence;
+package com.myCompany.gymBro.persistence.entity;
 
 import com.myCompany.gymBro.persistence.enums.PaymentType;
 import jakarta.persistence.*;

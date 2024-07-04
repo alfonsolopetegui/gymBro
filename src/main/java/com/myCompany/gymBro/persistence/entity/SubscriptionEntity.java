@@ -1,4 +1,4 @@
-package com.myCompany.gymBro.persistence;
+package com.myCompany.gymBro.persistence.entity;
 
 import com.myCompany.gymBro.persistence.enums.PaymentType;
 import jakarta.persistence.*;
@@ -35,4 +35,7 @@ public class SubscriptionEntity {
 
     @OneToMany(mappedBy = "subscription", fetch = FetchType.LAZY)
     private List<UserEntity> users;
+
+    @OneToMany(mappedBy = "subscription", fetch = FetchType.LAZY)
+    private List<SubscriptionClassEntity> classes;
 }

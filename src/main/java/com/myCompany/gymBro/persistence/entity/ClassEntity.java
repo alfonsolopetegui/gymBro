@@ -32,6 +32,4 @@ public class ClassEntity {
     @OneToMany(mappedBy = "classType", fetch = FetchType.LAZY)
     private List<ScheduleEntity> schedules;
 
-    @OneToMany(mappedBy = "classEntity", fetch = FetchType.LAZY)
-    private List<SubscriptionClassEntity> subscriptionClasses;
 }

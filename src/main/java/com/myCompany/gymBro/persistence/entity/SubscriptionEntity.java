@@ -1,5 +1,7 @@
 package com.myCompany.gymBro.persistence.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.myCompany.gymBro.persistence.enums.NumberOfClasses;
 import com.myCompany.gymBro.persistence.enums.PaymentType;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -10,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
+@Table(name = "subscription")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,15 +30,23 @@ public class SubscriptionEntity {
     @Enumerated(EnumType.STRING)
     private PaymentType subscriptionType;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "DECIMAL(10,2)")
     private Double price;
+
+    //Gestiona si el usuario tendra acceso a sala de musculación
+    @Column(name = "full_musculation", nullable = false)
+    private Boolean fullMusculation;
+
+    //Gestiona si el usuario tendra acceso a clases,y a cuantas
+    @Column(name = "number_of_classes")
+    @Enumerated(EnumType.STRING)
+    private NumberOfClasses numberOfClasses;
 
     @Column(nullable = false)
     private Boolean isActive;
 
+
     @OneToMany(mappedBy = "subscription", fetch = FetchType.LAZY)
     private List<UserEntity> users;
 
-    @OneToMany(mappedBy = "subscription", fetch = FetchType.LAZY)
-    private List<SubscriptionClassEntity> classes;
 }

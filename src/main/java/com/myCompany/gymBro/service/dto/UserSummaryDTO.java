@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Getter
@@ -27,4 +28,5 @@ public class UserSummaryDTO {
         this.email = user.getEmail();
         this.subscriptionName = user.getSubscription().getSubscriptionName();
     }
+
 }

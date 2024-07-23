@@ -10,4 +10,7 @@ import java.util.UUID;
 public interface ClassRepository extends ListCrudRepository<ClassEntity, UUID> {
 
     public Optional<ClassEntity> findFirstByClassNameIgnoreCase(String name);
+
+    boolean existsByClassNameIgnoreCase(String name);
+
 }

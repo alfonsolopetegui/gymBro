@@ -28,7 +28,7 @@ public class ScheduleEntity {
     @JoinColumn(name = "class_id", nullable = false)
     private ClassEntity classType;
 
-    @OneToMany(mappedBy = "schedule", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "schedule", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<UserRegistrationEntity> userRegistrations;
 
     @Column(name = "start_time", nullable = false)
@@ -40,7 +40,7 @@ public class ScheduleEntity {
     @Column(name = "max_registrations", nullable = false)
     private int maxRegistrations;
 
-    @OneToMany(mappedBy = "schedule", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "schedule", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ScheduleDayEntity> days;
 
     public boolean isRegistrationFull() {

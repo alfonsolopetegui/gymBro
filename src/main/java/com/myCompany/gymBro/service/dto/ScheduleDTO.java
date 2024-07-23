@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Setter
 @NoArgsConstructor
 public class ScheduleDTO {
-    private UUID scheduleId; // Corregir el error tipográfico
+    private UUID scheduleId;
     private String className;
     private LocalTime startTime;
     private LocalTime endTime;
@@ -34,7 +34,7 @@ public class ScheduleDTO {
         ;
         this.endTime = schedule.getEndTime();
         this.numberOfUsers = schedule.getUserRegistrations().size();
-        this.scheduleId = schedule.getScheduleId(); // Corregir el error tipográfico
+        this.scheduleId = schedule.getScheduleId();
         this.startTime = schedule.getStartTime();
 
         // Convertir UserRegistrationEntity a nombres de usuario

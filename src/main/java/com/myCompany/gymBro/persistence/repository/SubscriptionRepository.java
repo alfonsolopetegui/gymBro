@@ -6,4 +6,6 @@ import org.springframework.data.repository.ListCrudRepository;
 import java.util.UUID;
 
 public interface SubscriptionRepository extends ListCrudRepository<SubscriptionEntity, UUID> {
+
+    boolean existsBySubscriptionNameIgnoreCase(String subscriptionName);
 }

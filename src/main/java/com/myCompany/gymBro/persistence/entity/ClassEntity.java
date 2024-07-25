@@ -27,11 +27,9 @@ public class ClassEntity {
     private String classDescription;
 
     @Column(name = "is_active", nullable = false, columnDefinition = "TINYINT(1)")
-    private Boolean isActive;
+    private Boolean isActive = true;
 
     @OneToMany(mappedBy = "classType", fetch = FetchType.LAZY)
     private List<ScheduleEntity> schedules;
 
-    @OneToMany(mappedBy = "classEntity", fetch = FetchType.LAZY)
-    private List<SubscriptionClassEntity> subscriptionClasses;
 }

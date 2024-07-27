@@ -11,11 +11,18 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class EventDTO {
-
     private String summary;
     private String location;
     private String description;
-    private LocalDateTime startDateTime;
-    private LocalDateTime endDateTime;
+    private EventDateTime start;
+    private EventDateTime end;
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    public static class EventDateTime {
+        private String dateTime;
+        private String timeZone;
+    }
 
 }

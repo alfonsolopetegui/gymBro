@@ -1,9 +1,9 @@
 package com.myCompany.gymBro.service.dto;
 
-import com.myCompany.gymBro.persistence.entity.ScheduleDayEntity;
 import com.myCompany.gymBro.persistence.entity.UserRegistrationEntity;
 import com.myCompany.gymBro.persistence.enums.DayOfWeek;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalTime;
@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class RegistrationSummaryDTO {
 
     //user name

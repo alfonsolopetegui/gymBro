@@ -1,8 +1,9 @@
 package com.myCompany.gymBro.web.controllers;
 
-import com.myCompany.gymBro.persistence.entity.UserRegistrationEntity;
+
 import com.myCompany.gymBro.service.UserRegistrationService;
-import com.myCompany.gymBro.service.dto.RegistrationCreationDTO;
+import com.myCompany.gymBro.service.dto.RegistrationAndEventDTO;
+
 import com.myCompany.gymBro.service.dto.RegistrationSummaryDTO;
 import com.myCompany.gymBro.web.response.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +24,9 @@ public class UserRegistrationController {
     }
 
     //Crear registro de usuario a una clase
-    @PostMapping
-    public ResponseEntity<ApiResponse<RegistrationSummaryDTO>> saveRegistration(@RequestBody RegistrationCreationDTO registrationCreationDTO) {
-        ApiResponse<RegistrationSummaryDTO> response = this.userRegistrationService.saveRegistration(registrationCreationDTO);
+    @PostMapping("/save")
+    public ResponseEntity<ApiResponse<RegistrationSummaryDTO>> saveRegistration(@RequestBody RegistrationAndEventDTO registration) {
+        ApiResponse<RegistrationSummaryDTO> response = this.userRegistrationService.saveRegistration(registration);
         return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatus()));
     }
 

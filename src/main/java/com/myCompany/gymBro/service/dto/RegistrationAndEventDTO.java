@@ -1,14 +1,20 @@
 package com.myCompany.gymBro.service.dto;
 
+import com.google.api.services.calendar.model.EventDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @Getter
 @Setter
 @NoArgsConstructor
-public class EventDTO {
+public class RegistrationAndEventDTO {
+
+    //Registration
+    private String userId;
+    private String scheduleId;
+
+    //Event
     private String summary;
     private String location;
     private String description;
@@ -22,7 +28,6 @@ public class EventDTO {
         private String dateTime;
         private String timeZone;
 
-        // Constructor que inicializa los campos
         public EventDateTime(String dateTime, String timeZone) {
             this.dateTime = dateTime;
             this.timeZone = timeZone;

@@ -13,7 +13,10 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
+import com.myCompany.gymBro.persistence.entity.GoogleTokenEntity;
+import com.myCompany.gymBro.persistence.repository.GoogleTokenRepository;
 import com.myCompany.gymBro.service.dto.EventDTO;
+import com.myCompany.gymBro.web.response.ApiResponse;
 import org.springframework.stereotype.Service;
 
 
@@ -21,6 +24,12 @@ import java.io.IOException;
 
 @Service
 public class GoogleCalendarService {
+
+    private final GoogleTokenRepository googleTokenRepository;
+
+    public GoogleCalendarService(GoogleTokenRepository googleTokenRepository) {
+        this.googleTokenRepository = googleTokenRepository;
+    }
 
     public void createEvent(String token, EventDTO eventDTO) throws IOException {
 
@@ -72,6 +81,16 @@ public class GoogleCalendarService {
         } catch (IOException e) {
             System.err.println("Error al crear el evento: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    public ApiResponse<Void> saveToken(GoogleTokenEntity token) {
+        try {
+            this.googleTokenRepository.save(token);
+            return new ApiResponse<>("Token guardado co éxito", 200, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ApiResponse<>("Error al guardar el token", 500, null);
         }
     }
 

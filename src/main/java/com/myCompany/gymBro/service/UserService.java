@@ -71,6 +71,11 @@ public class UserService {
         return userSummaries;
     }
 
+    public UserEntity findByEmail(String email) {
+        return this.userRepository.findFirstByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("No se encontró el usuario"));
+    }
+
     public ApiResponse<UserSummaryDTO> getUser(String userId) {
 
         System.out.println("Entro");
@@ -110,11 +115,11 @@ public class UserService {
         }
 
         //Valido si el id del subscription es un UUID valido
-        if (!ValidationUtils.isValidUUID(user.getSubscriptionId())) {
+        if (!ValidationUtils.isValidUUID(String.valueOf(user.getSubscriptionId()))) {
             throw new IllegalArgumentException("Formato de UUID inválido para la suscripción");
         }
 
-        UUID subscriptionId = UUID.fromString(user.getSubscriptionId());
+        UUID subscriptionId = UUID.fromString(String.valueOf(user.getSubscriptionId()));
 
         UserEntity newUser = new UserEntity();
 
@@ -141,10 +146,10 @@ public class UserService {
 
     public ApiResponse<UserDetailsDTO> updateUser(UserUpdateDTO user) {
 
-        if (!ValidationUtils.isValidUUID(user.getUserId())) {
+        if (!ValidationUtils.isValidUUID(String.valueOf(user.getUserId()))) {
             throw new IllegalArgumentException("ID de usuario en formato UUID inválido");
         }
-        UUID userId = UUID.fromString(user.getUserId());
+        UUID userId = UUID.fromString(String.valueOf(user.getUserId()));
         // Buscar el usuario existente
         UserEntity existingUser = this.userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
@@ -160,8 +165,9 @@ public class UserService {
         if (user.getUserRole() != null) {
             existingUser.setUserRole(user.getUserRole());
         }
-        if (user.getSubscriptionId() != null && !user.getSubscriptionId().isEmpty()) {
-            UUID subscriptionId = UUID.fromString(user.getSubscriptionId());
+
+        if (user.getSubscriptionId() != null && !String.valueOf((user.getSubscriptionId())).isEmpty()) {
+            UUID subscriptionId = UUID.fromString(String.valueOf(user.getSubscriptionId()));
             existingUser.setSubscription(this.subscriptionRepository.findById(subscriptionId)
                     .orElseThrow(() -> new SubscriptionNotFoundException("No encontramos la subscripción")));
         }

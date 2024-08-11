@@ -4,8 +4,6 @@ package com.myCompany.gymBro.service;
 import com.google.api.client.googleapis.auth.oauth2.GoogleRefreshTokenRequest;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
-import com.google.auth.oauth2.AccessToken;
-import com.google.auth.oauth2.GoogleCredentials;
 import com.myCompany.gymBro.exception.UserNotFoundException;
 import com.myCompany.gymBro.persistence.entity.GoogleTokenEntity;
 import com.myCompany.gymBro.persistence.entity.UserEntity;
@@ -18,8 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -110,15 +109,18 @@ public class GoogleTokenService {
 
     public boolean isTokenValid(String accessToken) {
         try {
-            AccessToken token = new AccessToken(accessToken, null);
-            GoogleCredentials credentials = GoogleCredentials.create(token);
-            credentials.refreshIfExpired();
-            return !credentials.getAccessToken().getExpirationTime().before(new Date());
+            // Llama a un endpoint de la API de Google para validar el token
+            String url = "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + accessToken;
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            return responseCode == 200; // Si el código de respuesta es 200, el token es válido
         } catch (IOException e) {
+            System.err.println("Error al verificar el token: " + e.getMessage());
             return false;
         }
     }
-
 
     public String refreshToken(String refreshToken) {
         try {

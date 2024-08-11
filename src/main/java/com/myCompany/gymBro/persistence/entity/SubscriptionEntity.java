@@ -45,8 +45,20 @@ public class SubscriptionEntity {
     @Column(nullable = false)
     private Boolean isActive;
 
-
     @OneToMany(mappedBy = "subscription", fetch = FetchType.LAZY)
     private List<UserEntity> users;
 
+    @Override
+    public String toString() {
+        return "SubscriptionEntity{" +
+                "fullMusculation=" + fullMusculation +
+                ", subscriptionId=" + subscriptionId +
+                ", subscriptionName='" + subscriptionName + '\'' +
+                ", subscriptionType=" + subscriptionType +
+                ", price=" + price +
+                ", numberOfClasses=" + numberOfClasses +
+                ", isActive=" + isActive +
+                ", users=" + users +
+                '}';
+    }
 }

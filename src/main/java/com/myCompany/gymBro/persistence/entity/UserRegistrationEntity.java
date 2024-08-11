@@ -30,4 +30,14 @@ public class UserRegistrationEntity {
 
     @Column(name = "registration_date", nullable = false)
     private LocalDateTime registrationDate;
+
+    @Override
+    public String toString() {
+        return "UserRegistrationEntity{" +
+                "registrationDate=" + registrationDate +
+                ", registrationId=" + registrationId +
+                ", user=" + user.getUserId() +
+                ", schedule=" + schedule.getScheduleId() +
+                '}';
+    }
 }

@@ -32,4 +32,14 @@ public class GoogleTokenEntity {
         @JoinColumn(name = "user_id", referencedColumnName = "user_id")
         private UserEntity user;
 
+        @Override
+        public String toString() {
+                return "GoogleTokenEntity{" +
+                        "accessToken='" + accessToken + '\'' +
+                        ", tokenId=" + tokenId +
+                        ", expiresIn=" + expiresIn +
+                        ", refreshToken='" + refreshToken + '\'' +
+                        ", user=" + user.getUserId() +
+                        '}';
+        }
 }

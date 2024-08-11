@@ -61,4 +61,23 @@ public class UserEntity {
     //Agregado recientemente
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private GoogleTokenEntity googleToken;
+
+    @Override
+    public String toString() {
+        return "UserEntity{" +
+                "createCalendarEvents=" + createCalendarEvents +
+                ", userId=" + userId +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", userRole=" + userRole +
+                ", subscription=" + subscription.getSubscriptionName() +
+                ", lastPaymentDate=" + lastPaymentDate +
+                ", locked=" + locked +
+                ", disabled=" + disabled +
+                ", payments=" + payments +
+                ", registrations=" + registrations +
+                ", googleToken=" + googleToken +
+                '}';
+    }
 }

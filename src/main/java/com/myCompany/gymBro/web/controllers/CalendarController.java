@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.Base64;
+import java.util.UUID;
 
 
 @RestController
@@ -31,12 +32,11 @@ public class CalendarController {
     }
 
 
-    @GetMapping("calendar/authorize")
-    public RedirectView authorize() {
-        String userId = "ad26bee2-7aaa-41b5-974b-8cd399ac776b"; // Escribe aquí directamente el ID del usuario para pruebas
+    @GetMapping("calendar/authorize/{userId}")
+    public RedirectView authorize(@PathVariable UUID userId) {
 
         // Codifica el estado
-        String state = Base64.getEncoder().encodeToString(userId.getBytes());
+        String state = Base64.getEncoder().encodeToString(userId.toString().getBytes());
 
         String authorizationUrl = String.format(
                 "%s?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&state=%s&access_type=offline",

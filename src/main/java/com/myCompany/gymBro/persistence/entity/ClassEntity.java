@@ -32,4 +32,14 @@ public class ClassEntity {
     @OneToMany(mappedBy = "classType", fetch = FetchType.LAZY)
     private List<ScheduleEntity> schedules;
 
+    @Override
+    public String toString() {
+        return "ClassEntity{" +
+                "classDescription='" + classDescription + '\'' +
+                ", classId=" + classId +
+                ", className='" + className + '\'' +
+                ", isActive=" + isActive +
+                ", schedules=" + schedules +
+                '}';
+    }
 }

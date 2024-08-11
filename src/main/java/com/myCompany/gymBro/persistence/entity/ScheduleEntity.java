@@ -47,4 +47,15 @@ public class ScheduleEntity {
         return userRegistrations != null && userRegistrations.size() >= maxRegistrations;
     }
 
+    @Override
+    public String toString() {
+        return "ScheduleEntity{" +
+                "classType=" + (classType != null ? classType.getClassId() : null) +
+                ", scheduleId=" + scheduleId +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", maxRegistrations=" + maxRegistrations +
+                ", days=" + (days != null ? days.stream().map(ScheduleDayEntity::getDay).toList() : "[]") +
+                '}';
+    }
 }

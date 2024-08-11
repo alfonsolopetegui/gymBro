@@ -2,26 +2,28 @@ package com.myCompany.gymBro.service;
 
 import com.myCompany.gymBro.exception.RegistrationNotFoundException;
 import com.myCompany.gymBro.exception.ScheduleNotFoundException;
+import com.myCompany.gymBro.exception.TokenNotFoundException;
 import com.myCompany.gymBro.exception.UserNotFoundException;
-import com.myCompany.gymBro.persistence.entity.GoogleTokenEntity;
-import com.myCompany.gymBro.persistence.entity.ScheduleEntity;
-import com.myCompany.gymBro.persistence.entity.UserEntity;
-import com.myCompany.gymBro.persistence.entity.UserRegistrationEntity;
+import com.myCompany.gymBro.persistence.entity.*;
 import com.myCompany.gymBro.persistence.repository.GoogleTokenRepository;
 import com.myCompany.gymBro.persistence.repository.ScheduleRepository;
 import com.myCompany.gymBro.persistence.repository.UserRegistrationRepository;
 import com.myCompany.gymBro.persistence.repository.UserRepository;
 import com.myCompany.gymBro.service.dto.EventDTO;
-import com.myCompany.gymBro.service.dto.RegistrationAndEventDTO;
+import com.myCompany.gymBro.service.dto.RegistrationCreationDTO;
 import com.myCompany.gymBro.service.dto.RegistrationSummaryDTO;
 import com.myCompany.gymBro.utils.ValidationUtils;
 import com.myCompany.gymBro.web.response.ApiResponse;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 
 @Service
 public class UserRegistrationService {
@@ -43,19 +45,53 @@ public class UserRegistrationService {
         this.googleTokenService = googleTokenService;
     }
 
+    public ApiResponse<List<RegistrationSummaryDTO>> getAllRegistrationsByUserId(UUID userId) {
+        try {
+            // Cambia findAllById por el método adecuado, asumiendo que userId no es la clave primaria
+            List<UserRegistrationEntity> registrationEntities = this.userRegistrationRepository.findAllByUser_UserId(userId);
 
+            // Usar streams para mapear directamente las entidades a DTOs
+            List<RegistrationSummaryDTO> registrationSummaryDTOList = registrationEntities.stream()
+                    .map(RegistrationSummaryDTO::new)
+                    .collect(Collectors.toList());
+
+            return new ApiResponse<>("Se muestra lista de registros a clases", 200, registrationSummaryDTOList);
+
+        } catch (DataAccessException e) { // Ejemplo de excepción específica de Spring
+            e.printStackTrace();
+            return new ApiResponse<>("Error al buscar los registros en la base de datos", 500, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ApiResponse<>("Error inesperado al buscar los registros", 500, null);
+        }
+    }
+
+
+    public ApiResponse<UserRegistrationEntity> getById(UUID registrationId) {
+
+        UserRegistrationEntity reg = this.userRegistrationRepository.findById(registrationId)
+                .orElseThrow(() -> new RegistrationNotFoundException("No encontramos ese registro"));
+
+        return new ApiResponse<>("Registro encontrado", 200, reg);
+
+    }
+
+    //Método para crear registros de usuarios a clases con horarios definidos (schedules)
     @Transactional
-    public ApiResponse<RegistrationSummaryDTO> saveRegistration(RegistrationAndEventDTO registration) {
+    public ApiResponse<RegistrationSummaryDTO> saveRegistration(RegistrationCreationDTO registration) {
+
+        System.out.println("Entro al servicio");
+
         // Verifico que el userId y el scheduleId sean UUID válidos
-        if (!ValidationUtils.isValidUUID(registration.getUserId())) {
+        if (!ValidationUtils.isValidUUID(String.valueOf(registration.getUserId()))) {
             throw new IllegalArgumentException("El ID del usuario no es un UUID válido");
         }
-        if (!ValidationUtils.isValidUUID(registration.getScheduleId())) {
+        if (!ValidationUtils.isValidUUID(String.valueOf(registration.getScheduleId()))) {
             throw new IllegalArgumentException("El ID del schedule no es un UUID válido");
         }
 
-        UUID userId = UUID.fromString(registration.getUserId());
-        UUID scheduleId = UUID.fromString(registration.getScheduleId());
+        UUID userId = UUID.fromString(String.valueOf(registration.getUserId()));
+        UUID scheduleId = UUID.fromString(String.valueOf(registration.getScheduleId()));
 
         // Busco el usuario por su Id
         UserEntity userEntity = userRepository.findById(userId)
@@ -83,6 +119,8 @@ public class UserRegistrationService {
         UserRegistrationEntity savedRegistration = this.userRegistrationRepository.save(userRegistrationEntity);
         RegistrationSummaryDTO registrationSummary = new RegistrationSummaryDTO(savedRegistration);
 
+        System.out.println(userRegistrationEntity);
+
         if (userEntity.getCreateCalendarEvents()) {
             handleCalendarEventCreation(userEntity, scheduleEntity, registration);
         }
@@ -91,62 +129,78 @@ public class UserRegistrationService {
     }
 
     //Se encarga de validar el token del usuario, o de renovarlo si es necesario
-    private void handleCalendarEventCreation(UserEntity userEntity, ScheduleEntity scheduleEntity, RegistrationAndEventDTO registration) {
-        GoogleTokenEntity tokenEntity = this.googleTokenRepository.findByUser_UserId(userEntity.getUserId())
-                .orElse(null);
+    private void handleCalendarEventCreation(UserEntity userEntity, ScheduleEntity scheduleEntity, RegistrationCreationDTO registration) {
+        System.out.println("Entro a validar tokens");
+        System.out.println("UserId: " + userEntity.getUserId());
+        System.out.println(userEntity.getGoogleToken().getAccessToken());
+
+        String id = "ad26bee2-7aaa-41b5-974b-8cd399ac776b";
+        UUID id2 = UUID.fromString(id);
+
+        // Busca el token en la base de datos
+        GoogleTokenEntity tokenEntity = googleTokenRepository.findByUser_UserId(id2)
+                .orElseThrow(() -> new TokenNotFoundException("No encontramos el token"));
+
+
+        System.out.println("TokenEntity: " + tokenEntity);
 
         if (tokenEntity != null) {
             String accessToken = tokenEntity.getAccessToken();
             String refreshToken = tokenEntity.getRefreshToken();
 
+            System.out.println("AccessToken: " + accessToken);
+            System.out.println("RefreshToken: " + refreshToken);
+
             // Verifica si el token es válido
-            if (accessToken != null && !accessToken.isEmpty() && googleTokenService.isTokenValid(accessToken)) {
-                createEventInCalendar(accessToken, scheduleEntity, registration);
-            } else if (refreshToken != null && !refreshToken.isEmpty()) {
-                try {
-                    accessToken = googleTokenService.refreshToken(refreshToken);
-                    tokenEntity.setAccessToken(accessToken);
-                    googleTokenRepository.save(tokenEntity);
+            if (accessToken != null && !accessToken.isEmpty()) {
+                boolean isValid = googleTokenService.isTokenValid(accessToken);
+                System.out.println("Token válido: " + isValid);
+
+                if (isValid) {
                     createEventInCalendar(accessToken, scheduleEntity, registration);
-                } catch (Exception e) {
-                    throw new RuntimeException("Error al renovar el token de acceso", e);
+                } else if (refreshToken != null && !refreshToken.isEmpty()) {
+                    System.out.println("Token inválido, intentando renovar...");
+                    try {
+                        accessToken = googleTokenService.refreshToken(refreshToken);
+                        tokenEntity.setAccessToken(accessToken);
+                        googleTokenRepository.save(tokenEntity);
+                        System.out.println("Nuevo AccessToken: " + accessToken);
+                        createEventInCalendar(accessToken, scheduleEntity, registration);
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error al renovar el token de acceso", e);
+                    }
+                } else {
+                    throw new RuntimeException("Token de acceso y de actualización inválidos o ausentes");
                 }
             } else {
-                throw new RuntimeException("Token de acceso y de actualización inválidos o ausentes");
+                throw new RuntimeException("Token de acceso y de actualización ausentes");
             }
         } else {
             throw new RuntimeException("Tokens de acceso y de actualización ausentes");
         }
     }
 
-
-    //Se encarga de crear el EventDTO, que luego será la data para crear el evento en Calendar
-    private void createEventInCalendar(String accessToken, ScheduleEntity scheduleEntity, RegistrationAndEventDTO registration) {
-        EventDTO eventDTO = new EventDTO();
-        eventDTO.setSummary("Clase de " + scheduleEntity.getClassType().getClassName());
-        eventDTO.setLocation("GymBro");
-        eventDTO.setDescription(scheduleEntity.getClassType().getClassDescription());
-        eventDTO.setStart(new EventDTO.EventDateTime(registration.getStart().getDateTime(), "America/Argentina/Buenos_Aires"));
-        eventDTO.setEnd(new EventDTO.EventDateTime(registration.getEnd().getDateTime(), "America/Argentina/Buenos_Aires"));
-
+    //LLama a las funciones que crean el EventDTO, para luego llamar a la que crea el Evento
+    private void createEventInCalendar(String accessToken, ScheduleEntity scheduleEntity, RegistrationCreationDTO registration) {
         try {
+            System.out.println("intentando crear DTO");
+            EventDTO eventDTO = googleCalendarService.createEventDTO(scheduleEntity, registration);
+            System.out.println("intentando crear el evento");
             googleCalendarService.createEvent(accessToken, eventDTO);
         } catch (IOException e) {
-            throw new RuntimeException("Error al crear el evento en el calendario", e);
+            System.err.println("Error al crear el evento en Google Calendar: " + e.getMessage());
         }
     }
 
-
-
     //Metodo para eliminar un registro a una clase
-    public ApiResponse<Void> cancelRegistration(String registrationId) {
+    public ApiResponse<Void> cancelRegistration(UUID registrationId) {
 
         // Verifico que el userId y el scheduleId sean UUID válidos
-        if (!ValidationUtils.isValidUUID(registrationId)) {
+        if (!ValidationUtils.isValidUUID(String.valueOf(registrationId))) {
             throw new IllegalArgumentException("El ID proporcionado no es un UUID válido");
         }
 
-        UUID regId = UUID.fromString(registrationId);
+        UUID regId = UUID.fromString(String.valueOf(registrationId));
 
         //Busco el registro por su Id
         UserRegistrationEntity registrationEntity = this.userRegistrationRepository.findById(regId)

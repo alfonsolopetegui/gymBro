@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 
 @Getter
 @Setter
@@ -14,6 +16,8 @@ public class EventDTO {
     private String description;
     private EventDateTime start;
     private EventDateTime end;
+
+    private List<String> days;
 
     @Getter
     @Setter
@@ -29,4 +33,16 @@ public class EventDTO {
         }
     }
 
+
+    @Override
+    public String toString() {
+        return "EventDTO{" +
+                "days=" + days +
+                ", summary='" + summary + '\'' +
+                ", location='" + location + '\'' +
+                ", description='" + description + '\'' +
+                ", start=" + start.dateTime +
+                ", end=" + end.dateTime +
+                '}';
+    }
 }

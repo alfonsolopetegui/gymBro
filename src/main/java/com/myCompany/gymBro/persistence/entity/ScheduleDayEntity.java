@@ -28,4 +28,12 @@ public class ScheduleDayEntity {
     @JoinColumn(name = "schedule_id")
     private ScheduleEntity schedule;
 
+    @Override
+    public String toString() {
+        return "ScheduleDayEntity{" +
+                "day=" + day +
+                ", scheduleDayId=" + scheduleDayId +
+                ", schedule=" + schedule +
+                '}';
+    }
 }

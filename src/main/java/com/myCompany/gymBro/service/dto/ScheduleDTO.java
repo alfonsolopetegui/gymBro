@@ -1,6 +1,5 @@
 package com.myCompany.gymBro.service.dto;
 
-
 import com.myCompany.gymBro.persistence.entity.ScheduleEntity;
 
 import lombok.Getter;
@@ -18,12 +17,19 @@ import java.util.stream.Collectors;
 @Setter
 @NoArgsConstructor
 public class ScheduleDTO {
+
     private UUID scheduleId;
+
     private String className;
+
     private LocalTime startTime;
+
     private LocalTime endTime;
+
     private List<String> days;
+
     private int numberOfUsers;
+
     private List<String> userNames;
 
     public ScheduleDTO(ScheduleEntity schedule) {

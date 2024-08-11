@@ -1,9 +1,10 @@
 package com.myCompany.gymBro.service.dto;
 
-import com.myCompany.gymBro.persistence.entity.ScheduleDayEntity;
 import com.myCompany.gymBro.persistence.entity.UserRegistrationEntity;
 import com.myCompany.gymBro.persistence.enums.DayOfWeek;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalTime;
@@ -12,17 +13,20 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class RegistrationSummaryDTO {
 
-    //user name
+
     private String userName;
-    //className
+
     private String className;
-    //Days
+
     private List<DayOfWeek> days;
-    //startTime
+
+    @Schema(description = "Hora de inicio", type = "string", format = "HH:mm:ss", example = "09:00:00")
     private LocalTime startTime;
-    //endTime
+
+    @Schema(description = "Hora de inicio", type = "string", format = "HH:mm:ss", example = "10:00:00")
     private LocalTime endTime;
 
     public RegistrationSummaryDTO(UserRegistrationEntity registration) {

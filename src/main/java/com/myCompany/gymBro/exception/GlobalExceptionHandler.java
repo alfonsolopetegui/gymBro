@@ -33,6 +33,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(TokenNotFoundException.class)
+    public ResponseEntity<ApiResponse<String>> handleTokenNotFoundException(TokenNotFoundException ex) {
+        ApiResponse<String> response = new ApiResponse<>(ex.getMessage(), HttpStatus.NOT_FOUND.value(), null);
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(ScheduleNotFoundException.class)
     public ResponseEntity<ApiResponse<String>> handleScheduleNotFoundException(ScheduleNotFoundException ex) {
         ApiResponse<String> response = new ApiResponse<>(ex.getMessage(), HttpStatus.NOT_FOUND.value(), null);
@@ -55,6 +61,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<String>> handleClassNotFoundException(CustomClassNotFoundException ex) {
         ApiResponse<String> response = new ApiResponse<>(ex.getMessage(), HttpStatus.NOT_FOUND.value(), null);
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<String>> handleAccessDeniedException(AccessDeniedException ex) {
+        ApiResponse<String> response = new ApiResponse<>(ex.getMessage(), HttpStatus.FORBIDDEN.value(), null);
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

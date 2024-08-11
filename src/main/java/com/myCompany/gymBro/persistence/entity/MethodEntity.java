@@ -28,4 +28,14 @@ public class MethodEntity {
 
     @OneToMany(mappedBy = "method", fetch = FetchType.LAZY)
     private List<PaymentEntity> payments;
+
+    @Override
+    public String toString() {
+        return "MethodEntity{" +
+                "isActive=" + isActive +
+                ", methodId=" + methodId +
+                ", methodName='" + methodName + '\'' +
+                ", payments=" + payments +
+                '}';
+    }
 }

@@ -120,11 +120,11 @@ public class SubscriptionService {
 
     public ApiResponse<SubscriptionDTO> updateSubscription(SubscriptionDTO subscriptionDTO) {
 
-        if (!ValidationUtils.isValidUUID(subscriptionDTO.getSubscriptionId())) {
+        if (!ValidationUtils.isValidUUID(String.valueOf(subscriptionDTO.getSubscriptionId()))) {
             return new ApiResponse<>("El id no es un UUID válido", 404, null);
         }
 
-        UUID subscriptionId = UUID.fromString(subscriptionDTO.getSubscriptionId());
+        UUID subscriptionId = UUID.fromString(String.valueOf(subscriptionDTO.getSubscriptionId()));
 
         SubscriptionEntity existingSubscription = this.subscriptionRepository.findById(subscriptionId)
                 .orElseThrow(() -> new SubscriptionNotFoundException("La subscription que buscas no existe"));

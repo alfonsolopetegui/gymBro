@@ -10,13 +10,12 @@ import com.myCompany.gymBro.persistence.repository.ClassRepository;
 import com.myCompany.gymBro.persistence.repository.ScheduleRepository;
 import com.myCompany.gymBro.service.dto.ScheduleCreationDTO;
 import com.myCompany.gymBro.service.dto.ScheduleDTO;
+import com.myCompany.gymBro.service.dto.ScheduleSummaryDTO;
 import com.myCompany.gymBro.service.dto.ScheduleUpdateDTO;
 import com.myCompany.gymBro.utils.ValidationUtils;
 import com.myCompany.gymBro.web.response.ApiResponse;
 import org.springframework.stereotype.Service;
 
-
-import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,11 +43,11 @@ public class ScheduleService {
     public ApiResponse<ScheduleCreationDTO> saveSchedule(ScheduleCreationDTO scheduleCreationDTO) {
 
         //Valida que UUID sea correcto
-        if (!ValidationUtils.isValidUUID(scheduleCreationDTO.getClassId())) {
+        if (!ValidationUtils.isValidUUID(String.valueOf(scheduleCreationDTO.getClassId()))) {
             return new ApiResponse<>("El ID no es un UUID válido", 404, null);
         }
 
-        UUID classId = UUID.fromString(scheduleCreationDTO.getClassId());
+        UUID classId = UUID.fromString(String.valueOf(scheduleCreationDTO.getClassId()));
 
         //Busca que la clase exista
         ClassEntity classType = this.classRepository.findById(classId)
@@ -117,10 +116,10 @@ public class ScheduleService {
 
 
         // Validar UUIDs
-        if (!ValidationUtils.isValidUUID(scheduleUpdateDTO.getScheduleId())) {
+        if (!ValidationUtils.isValidUUID(String.valueOf(scheduleUpdateDTO.getScheduleId()))) {
             return new ApiResponse<>("El Id proporcionado del schedule no es un UUID válido", 400, null);
         }
-        if (!ValidationUtils.isValidUUID(scheduleUpdateDTO.getClassId())) {
+        if (!ValidationUtils.isValidUUID(String.valueOf(scheduleUpdateDTO.getClassId()))) {
             return new ApiResponse<>("El Id proporcionado de la clase no es un UUID válido", 400, null);
         }
 
@@ -150,11 +149,11 @@ public class ScheduleService {
             }
         }
 
-        UUID scheduleId = UUID.fromString(scheduleUpdateDTO.getScheduleId());
+        UUID scheduleId = UUID.fromString(String.valueOf(scheduleUpdateDTO.getScheduleId()));
         ScheduleEntity existingSchedule = this.scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new ScheduleNotFoundException("El schedule que buscas no existe"));
 
-        UUID classId = UUID.fromString(scheduleUpdateDTO.getClassId());
+        UUID classId = UUID.fromString(String.valueOf(scheduleUpdateDTO.getClassId()));
         ClassEntity classEntity = this.classRepository.findById(classId)
                 .orElseThrow(() -> new CustomClassNotFoundException("La clase que buscas no existe"));
 
@@ -181,6 +180,18 @@ public class ScheduleService {
         }
     }
 
+    public ApiResponse<List<ScheduleSummaryDTO>> getAllByClassId(UUID classId) {
+
+        List<ScheduleEntity> scheduleEntities = this.scheduleRepository.findAllByClassType_ClassId(classId);
+
+        List<ScheduleSummaryDTO> scheduleSummaryDTOList = new ArrayList<>();
+        for (ScheduleEntity schedule : scheduleEntities) {
+            ScheduleSummaryDTO scheduleSummaryDTO = new ScheduleSummaryDTO(schedule);
+            scheduleSummaryDTOList.add(scheduleSummaryDTO);
+        }
+
+        return new ApiResponse<>("Lista de Schedules por clase", 200, scheduleSummaryDTOList);
+    }
 
 
 }

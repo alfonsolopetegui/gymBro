@@ -126,13 +126,13 @@ public class ClassService {
 
     }
 
-    public ApiResponse<ClassEntity> updateClass(ClassUpdateDTO classUpdateDTO) {
+    public ApiResponse<ClassUpdateDTO> updateClass(ClassUpdateDTO classUpdateDTO) {
 
         // Validación del ID
-        if (!ValidationUtils.isValidUUID(classUpdateDTO.getClassId())) {
+        if (!ValidationUtils.isValidUUID(String.valueOf(classUpdateDTO.getClassId()))) {
             return new ApiResponse<>("El ID no es un UUID válido", 404, null);
         }
-        UUID id = UUID.fromString(classUpdateDTO.getClassId());
+        UUID id = UUID.fromString(String.valueOf(classUpdateDTO.getClassId()));
 
         // Búsqueda de la clase
         ClassEntity existingClass = this.classRepository.findById(id)
@@ -154,12 +154,14 @@ public class ClassService {
         try {
             // Guardado de la clase actualizada
             ClassEntity updatedClass = this.classRepository.save(existingClass);
-            return new ApiResponse<>("Clase modificada con éxito", 200, updatedClass);
+            ClassUpdateDTO classUpdateResponse = new ClassUpdateDTO(updatedClass);
+            return new ApiResponse<>("Clase modificada con éxito", 200, classUpdateResponse);
         } catch (Exception e) {
             // Manejo de cualquier excepción durante el guardado
             return new ApiResponse<>("Ocurrió un error al guardar la clase actualizada", 500, null);
         }
     }
+
 
 
 }

@@ -5,11 +5,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface UserRegistrationRepository extends ListCrudRepository<UserRegistrationEntity, UUID> {
 
     @Query("SELECT CASE WHEN COUNT(ur) > 0 THEN TRUE ELSE FALSE END FROM UserRegistrationEntity ur WHERE ur.user.userId = :userId AND ur.schedule.scheduleId = :scheduleId")
     boolean existsByUserIdAndScheduleId(@Param("userId") UUID userId, @Param("scheduleId") UUID scheduleId);
+
+
+    public List<UserRegistrationEntity> findAllByUser_UserId(UUID userId);
+
 }
 

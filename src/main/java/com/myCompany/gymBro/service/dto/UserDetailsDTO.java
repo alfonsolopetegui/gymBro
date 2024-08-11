@@ -2,6 +2,7 @@ package com.myCompany.gymBro.service.dto;
 
 import com.myCompany.gymBro.persistence.entity.UserEntity;
 import com.myCompany.gymBro.persistence.enums.UserRole;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,13 +14,30 @@ import java.util.UUID;
 @NoArgsConstructor
 public class UserDetailsDTO {
 
+    @NotNull(message = "Este campo no puede ser null")
     private UUID userId;
+
+    @NotBlank(message = "Este campo no puede estar vacío")
     private String username;
+
+    @NotBlank(message = "Este campo no puede estar vacío")
+    @Email(message = "Formato incorrecto de email")
     private String email;
+
+    @NotBlank(message = "Este campo no puede estar vacío")
     private String subscriptionName;
+
+    @NotNull(message = "Este campo no puede ser null")
+    @Positive(message = "el precio debe ser un valor positivo")
     private Double subscriptionPrice;
+
+    @NotNull(message = "Este campo no puede ser null")
     private UserRole userRole;
+
+    @NotNull(message = "Este campo no puede ser null")
     private Boolean locked;
+
+    @NotNull(message = "Este campo no puede ser null")
     private Boolean disabled;
 
     public UserDetailsDTO(UserEntity user) {

@@ -39,4 +39,15 @@ public class PaymentEntity {
     @Column(nullable = false)
     private LocalDateTime paymentDate;
 
+    @Override
+    public String toString() {
+        return "PaymentEntity{" +
+                "amount=" + amount +
+                ", paymentId=" + paymentId +
+                ", user=" + user +
+                ", paymentType=" + paymentType +
+                ", method=" + method +
+                ", paymentDate=" + paymentDate +
+                '}';
+    }
 }

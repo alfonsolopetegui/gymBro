@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Getter
@@ -17,12 +17,32 @@ public class EventDTO {
     private EventDateTime start;
     private EventDateTime end;
 
+    private List<String> days;
+
     @Getter
     @Setter
     @NoArgsConstructor
     public static class EventDateTime {
         private String dateTime;
         private String timeZone;
+
+        // Constructor que inicializa los campos
+        public EventDateTime(String dateTime, String timeZone) {
+            this.dateTime = dateTime;
+            this.timeZone = timeZone;
+        }
     }
 
+
+    @Override
+    public String toString() {
+        return "EventDTO{" +
+                "days=" + days +
+                ", summary='" + summary + '\'' +
+                ", location='" + location + '\'' +
+                ", description='" + description + '\'' +
+                ", start=" + start.dateTime +
+                ", end=" + end.dateTime +
+                '}';
+    }
 }

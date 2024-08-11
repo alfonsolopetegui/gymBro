@@ -1,10 +1,13 @@
 package com.myCompany.gymBro.service;
 
 import com.myCompany.gymBro.exception.SubscriptionNotFoundException;
+import com.myCompany.gymBro.exception.TokenNotFoundException;
 import com.myCompany.gymBro.exception.UserNotFoundException;
+import com.myCompany.gymBro.persistence.entity.GoogleTokenEntity;
 import com.myCompany.gymBro.persistence.entity.SubscriptionEntity;
 import com.myCompany.gymBro.persistence.entity.UserEntity;
 import com.myCompany.gymBro.persistence.enums.UserRole;
+import com.myCompany.gymBro.persistence.repository.GoogleTokenRepository;
 import com.myCompany.gymBro.persistence.repository.SubscriptionRepository;
 import com.myCompany.gymBro.persistence.repository.UserRepository;
 import com.myCompany.gymBro.service.dto.UserCreationDTO;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -24,10 +28,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final SubscriptionRepository subscriptionRepository;
+    private final GoogleTokenRepository googleTokenRepository;
 
-    public UserService(UserRepository userRepository, SubscriptionRepository subscriptionRepository) {
+    public UserService(UserRepository userRepository, SubscriptionRepository subscriptionRepository, GoogleTokenRepository googleTokenRepository) {
         this.userRepository = userRepository;
         this.subscriptionRepository = subscriptionRepository;
+        this.googleTokenRepository = googleTokenRepository;
     }
 
     public ApiResponse<List<UserDetailsDTO>> getAllUsers() {
@@ -63,6 +69,11 @@ public class UserService {
         }
 
         return userSummaries;
+    }
+
+    public UserEntity findByEmail(String email) {
+        return this.userRepository.findFirstByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("No se encontró el usuario"));
     }
 
     public ApiResponse<UserSummaryDTO> getUser(String userId) {
@@ -104,11 +115,11 @@ public class UserService {
         }
 
         //Valido si el id del subscription es un UUID valido
-        if (!ValidationUtils.isValidUUID(user.getSubscriptionId())) {
+        if (!ValidationUtils.isValidUUID(String.valueOf(user.getSubscriptionId()))) {
             throw new IllegalArgumentException("Formato de UUID inválido para la suscripción");
         }
 
-        UUID subscriptionId = UUID.fromString(user.getSubscriptionId());
+        UUID subscriptionId = UUID.fromString(String.valueOf(user.getSubscriptionId()));
 
         UserEntity newUser = new UserEntity();
 
@@ -135,10 +146,10 @@ public class UserService {
 
     public ApiResponse<UserDetailsDTO> updateUser(UserUpdateDTO user) {
 
-        if (!ValidationUtils.isValidUUID(user.getUserId())) {
+        if (!ValidationUtils.isValidUUID(String.valueOf(user.getUserId()))) {
             throw new IllegalArgumentException("ID de usuario en formato UUID inválido");
         }
-        UUID userId = UUID.fromString(user.getUserId());
+        UUID userId = UUID.fromString(String.valueOf(user.getUserId()));
         // Buscar el usuario existente
         UserEntity existingUser = this.userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
@@ -154,8 +165,9 @@ public class UserService {
         if (user.getUserRole() != null) {
             existingUser.setUserRole(user.getUserRole());
         }
-        if (user.getSubscriptionId() != null && !user.getSubscriptionId().isEmpty()) {
-            UUID subscriptionId = UUID.fromString(user.getSubscriptionId());
+
+        if (user.getSubscriptionId() != null && !String.valueOf((user.getSubscriptionId())).isEmpty()) {
+            UUID subscriptionId = UUID.fromString(String.valueOf(user.getSubscriptionId()));
             existingUser.setSubscription(this.subscriptionRepository.findById(subscriptionId)
                     .orElseThrow(() -> new SubscriptionNotFoundException("No encontramos la subscripción")));
         }
@@ -213,6 +225,20 @@ public class UserService {
 
     public Boolean exists(UUID userId) {
         return this.userRepository.existsById(userId);
+    }
+
+    public String getUserAccessToken(UUID userId) {
+        // Buscar el token en el repositorio
+        Optional<GoogleTokenEntity> tokenOptional = this.googleTokenRepository.findByUser_UserId(userId);
+
+        // Verificar si el token está presente
+        if (tokenOptional.isPresent()) {
+            // Devolver el token de acceso
+            return tokenOptional.get().getAccessToken();
+        } else {
+            // Manejar el caso donde el token no está presente
+            throw new TokenNotFoundException("No se encontró un token para el usuario con ID: " + userId);
+        }
     }
 
 

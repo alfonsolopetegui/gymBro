@@ -2,6 +2,7 @@ package com.myCompany.gymBro.service.dto;
 
 import com.myCompany.gymBro.persistence.entity.ClassEntity;
 import com.myCompany.gymBro.persistence.entity.ScheduleEntity;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
@@ -17,9 +18,15 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class ClassDTO {
+
     private UUID classId;
+
+    @Schema(example = "Pilates")
     private String className;
+
+    @Schema(example = "Trabajo de fuerza y elasticidad")
     private String classDescription;
+
     private List<ScheduleSummaryDTO> schedules;
 
     public ClassDTO(ClassEntity classEntity) {

@@ -25,7 +25,6 @@ public class UserUpdateDTO {
     private String username;
 
     @Schema(example = "pabloMo333@gmail.com")
-    @NotBlank(message = "Este campo no puede estar vacío")
     @Email(message = "Formato incorrecto de email")
     private String email;
 

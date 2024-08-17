@@ -28,6 +28,8 @@ public class AuthController {
         this.authService = authService;
     }
 
+    //Un usuario ya registrado puede hacer login con este endpoint, usando su email y su password.
+    //Con esto generará un JWT, que luego debe usar en el header de cada request que realice posteriormente
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody LoginDTO loginDTO) {
 

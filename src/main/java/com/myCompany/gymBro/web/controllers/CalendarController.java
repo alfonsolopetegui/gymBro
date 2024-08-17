@@ -31,7 +31,9 @@ public class CalendarController {
         this.googleTokenService = googleTokenService;
     }
 
-
+    //Si tenes un usuario registrado, este endpoint te redirige a Calendar, para generar permisos a la app, y
+    //devolverá un token que será guardado en la base de datos, para luego crear los eventos al momento
+    //de registrarse a un horario de una clase
     @GetMapping("calendar/authorize/{userId}")
     public RedirectView authorize(@PathVariable UUID userId) {
 

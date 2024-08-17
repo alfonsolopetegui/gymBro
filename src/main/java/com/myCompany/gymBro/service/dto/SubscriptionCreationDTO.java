@@ -19,21 +19,19 @@ import lombok.Setter;
 public class SubscriptionCreationDTO {
 
 
-    @NotNull(message = "este campo no puede ser nulo")
     @NotEmpty(message = "este campo no puede estar vacío")
     private String subscriptionName;
 
-    @NotEmpty(message = "este campo no puede estar vacío")
+    @NotNull(message = "este campo no puede ser nulo")
     private PaymentType subscriptionType;
 
-    @NotEmpty(message = "este campo no puede estar vacío")
     @Positive(message = "el precio debe ser un valor positivo")
     private Double price;
 
     @NotNull(message = "este campo no puede ser nulo")
     private boolean fullMusculation;
 
-    @NotEmpty(message = "este campo no puede estar vacío")
+    @NotNull(message = "este campo no puede estar vacío")
     private NumberOfClasses numberOfClasses;
 
     @NotNull(message = "este campo no puede ser nulo")

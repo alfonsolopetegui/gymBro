@@ -76,22 +76,16 @@ public class UserRegistrationService {
 
     }
 
-    //Método para crear registros de usuarios a clases con horarios definidos (schedules)
+    //Método para crear registros de usuarios a clases con horarios definidos (schedules).
+    //Si el usuario tiene configurado para crear eventos en calendar, ejecutará handleCalendarEventCreation
+    //Al ser Transactional, si alguna parte falla, se cancelará el método completo
     @Transactional
     public ApiResponse<RegistrationSummaryDTO> saveRegistration(RegistrationCreationDTO registration) {
 
         System.out.println("Entro al servicio");
 
-        // Verifico que el userId y el scheduleId sean UUID válidos
-        if (!ValidationUtils.isValidUUID(String.valueOf(registration.getUserId()))) {
-            throw new IllegalArgumentException("El ID del usuario no es un UUID válido");
-        }
-        if (!ValidationUtils.isValidUUID(String.valueOf(registration.getScheduleId()))) {
-            throw new IllegalArgumentException("El ID del schedule no es un UUID válido");
-        }
-
-        UUID userId = UUID.fromString(String.valueOf(registration.getUserId()));
-        UUID scheduleId = UUID.fromString(String.valueOf(registration.getScheduleId()));
+        UUID userId = registration.getUserId();
+        UUID scheduleId = registration.getScheduleId();
 
         // Busco el usuario por su Id
         UserEntity userEntity = userRepository.findById(userId)
@@ -122,7 +116,12 @@ public class UserRegistrationService {
         System.out.println(userRegistrationEntity);
 
         if (userEntity.getCreateCalendarEvents()) {
-            handleCalendarEventCreation(userEntity, scheduleEntity, registration);
+            try {
+                handleCalendarEventCreation(userEntity, scheduleEntity, registration);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Error al intentar crear el Evento");
+            }
         }
 
         return new ApiResponse<>("Registro a clase creado correctamente", 200, registrationSummary);
@@ -134,11 +133,10 @@ public class UserRegistrationService {
         System.out.println("UserId: " + userEntity.getUserId());
         System.out.println(userEntity.getGoogleToken().getAccessToken());
 
-        String id = "ad26bee2-7aaa-41b5-974b-8cd399ac776b";
-        UUID id2 = UUID.fromString(id);
+        UUID id = registration.getUserId();
 
         // Busca el token en la base de datos
-        GoogleTokenEntity tokenEntity = googleTokenRepository.findByUser_UserId(id2)
+        GoogleTokenEntity tokenEntity = googleTokenRepository.findByUser_UserId(id)
                 .orElseThrow(() -> new TokenNotFoundException("No encontramos el token"));
 
 
@@ -195,21 +193,13 @@ public class UserRegistrationService {
     //Metodo para eliminar un registro a una clase
     public ApiResponse<Void> cancelRegistration(UUID registrationId) {
 
-        // Verifico que el userId y el scheduleId sean UUID válidos
-        if (!ValidationUtils.isValidUUID(String.valueOf(registrationId))) {
-            throw new IllegalArgumentException("El ID proporcionado no es un UUID válido");
-        }
-
-        UUID regId = UUID.fromString(String.valueOf(registrationId));
-
         //Busco el registro por su Id
-        UserRegistrationEntity registrationEntity = this.userRegistrationRepository.findById(regId)
+        UserRegistrationEntity registrationEntity = this.userRegistrationRepository.findById(registrationId)
                 .orElseThrow(() -> new RegistrationNotFoundException("Registro no encontrado"));
-
 
         try {
             // Eliminar el registro
-            userRegistrationRepository.deleteById(regId);
+            userRegistrationRepository.deleteById(registrationId);
         } catch (Exception e) {
             // Manejar excepciones inesperadas
             throw new RuntimeException("Error al cancelar el registro", e);

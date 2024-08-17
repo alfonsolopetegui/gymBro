@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
@@ -26,7 +27,7 @@ public class ScheduleDTO {
 
     private LocalTime endTime;
 
-    private List<String> days;
+    private List<DayOfWeek> days;
 
     private int numberOfUsers;
 
@@ -34,10 +35,7 @@ public class ScheduleDTO {
 
     public ScheduleDTO(ScheduleEntity schedule) {
         this.className = schedule.getClassType().getClassName();
-        this.days = schedule.getDays().stream()
-                .map(day -> day.getDay().toString())
-                .collect(Collectors.toList())
-        ;
+        this.days = schedule.getDays();
         this.endTime = schedule.getEndTime();
         this.numberOfUsers = schedule.getUserRegistrations().size();
         this.scheduleId = schedule.getScheduleId();

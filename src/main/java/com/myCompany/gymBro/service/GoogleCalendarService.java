@@ -14,7 +14,6 @@ import com.google.api.services.calendar.model.EventDateTime;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.myCompany.gymBro.persistence.entity.GoogleTokenEntity;
-import com.myCompany.gymBro.persistence.entity.ScheduleDayEntity;
 import com.myCompany.gymBro.persistence.entity.ScheduleEntity;
 import com.myCompany.gymBro.persistence.repository.GoogleTokenRepository;
 import com.myCompany.gymBro.service.dto.EventDTO;
@@ -31,9 +30,12 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static java.util.Calendar.MONDAY;
+
 
 @Service
 public class GoogleCalendarService {
@@ -124,7 +126,7 @@ public class GoogleCalendarService {
             System.out.println("End Recurrence Date: " + endDateTimeStr);
 
             // Construye la regla de recurrencia
-            String recurrenceRule = "RRULE:FREQ=WEEKLY;BYDAY=" + String.join(",", eventDTO.getDays()) + ";UNTIL=" + endDateTimeStr;
+            String recurrenceRule = "RRULE:FREQ=WEEKLY;BYDAY=" + eventDTO.getDays() + ";UNTIL=" + endDateTimeStr;
             System.out.println("Recurrence Rule: " + recurrenceRule);
 
 
@@ -151,15 +153,18 @@ public class GoogleCalendarService {
         eventDTO.setSummary("Clase de " + scheduleEntity.getClassType().getClassName());
         eventDTO.setLocation("GymBro");
         eventDTO.setDescription(scheduleEntity.getClassType().getClassDescription());
-        eventDTO.setDays(getFormattedDays(scheduleEntity.getDays()));
 
-        // Convertir los días personalizados a DayOfWeek
-        List<DayOfWeek> daysOfWeek = getDaysOfWeek(scheduleEntity.getDays());
+        //Convertir el formato de días a Calendar
+        String calendarDays = String.join(",", getCalendarDayType(scheduleEntity.getDays()));
+        eventDTO.setDays(calendarDays);
+
+        System.out.println("calenday days: " + calendarDays);
 
         // Extraer la hora de inicio
         LocalTime startTime = scheduleEntity.getStartTime();
 
         // Calcular originalStartDate
+        List<DayOfWeek> daysOfWeek = scheduleEntity.getDays();
         EventDTO.EventDateTime originalStartDate = calculateOriginalStartDate(daysOfWeek, startTime);
         eventDTO.setStart(originalStartDate);
 
@@ -172,21 +177,38 @@ public class GoogleCalendarService {
         return eventDTO;
     }
 
-    // Calcula la fecha de finalización (un mes después de la fecha original)
-    private String calculateRecurrenceEndDate(String start) {
-        LocalDate originalStartDate = LocalDate.parse(start.substring(0, 10)); // Extrae solo la fecha
-        LocalDate endDate = originalStartDate.plus(1, ChronoUnit.MONTHS); // Suma un mes
-        return endDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "T000000Z"; // Formato: YYYYMMDDTHHMMSSZ
-    }
+    public List<String> getCalendarDayType(List<DayOfWeek> days) {
+        List<String> calendarDays = new ArrayList<>();
 
-    public ApiResponse<Void> saveToken(GoogleTokenEntity token) {
-        try {
-            this.googleTokenRepository.save(token);
-            return new ApiResponse<>("Token guardado co éxito", 200, null);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ApiResponse<>("Error al guardar el token", 500, null);
+        for (DayOfWeek day : days) {
+            switch (day) {
+                case MONDAY:
+                    calendarDays.add("MO");
+                    break;
+                case TUESDAY:
+                    calendarDays.add("TU");
+                    break;
+                case WEDNESDAY:
+                    calendarDays.add("WE");
+                    break;
+                case THURSDAY:
+                    calendarDays.add("TH");
+                    break;
+                case FRIDAY:
+                    calendarDays.add("FR");
+                    break;
+                case SATURDAY:
+                    calendarDays.add("SA");
+                    break;
+                case SUNDAY:
+                    calendarDays.add("SU");
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown day: " + day);
+            }
         }
+
+        return calendarDays;
     }
 
     public EventDTO.EventDateTime calculateOriginalStartDate(List<DayOfWeek> daysOfWeek, LocalTime startTime) {
@@ -201,56 +223,6 @@ public class GoogleCalendarService {
         }
 
         return new EventDTO.EventDateTime(now.toString(), "America/Argentina/Buenos_Aires");
-    }
-
-    private List<DayOfWeek> getDaysOfWeek(List<ScheduleDayEntity> days) {
-        return days.stream()
-                .map(day -> {
-                    switch (day.getDay()) {
-                        case MONDAY:
-                            return DayOfWeek.MONDAY;
-                        case TUESDAY:
-                            return DayOfWeek.TUESDAY;
-                        case WEDNESDAY:
-                            return DayOfWeek.WEDNESDAY;
-                        case THURSDAY:
-                            return DayOfWeek.THURSDAY;
-                        case FRIDAY:
-                            return DayOfWeek.FRIDAY;
-                        case SATURDAY:
-                            return DayOfWeek.SATURDAY;
-                        case SUNDAY:
-                            return DayOfWeek.SUNDAY;
-                        default:
-                            throw new IllegalArgumentException("Invalid day of the week: " + day);
-                    }
-                })
-                .collect(Collectors.toList());
-    }
-
-    private List<String> getFormattedDays(List<ScheduleDayEntity> days) {
-        return days.stream()
-                .map(day -> {
-                    switch (day.getDay()) {
-                        case MONDAY:
-                            return "MO";
-                        case TUESDAY:
-                            return "TU";
-                        case WEDNESDAY:
-                            return "WE";
-                        case THURSDAY:
-                            return "TH";
-                        case FRIDAY:
-                            return "FR";
-                        case SATURDAY:
-                            return "SA";
-                        case SUNDAY:
-                            return "SU";
-                        default:
-                            throw new IllegalArgumentException("Invalid day of the week: " + day);
-                    }
-                })
-                .collect(Collectors.toList());
     }
 
 }

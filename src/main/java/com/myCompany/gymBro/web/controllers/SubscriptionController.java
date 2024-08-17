@@ -46,6 +46,9 @@ public class SubscriptionController {
                     content = @Content(schema = @Schema(implementation = SubscriptionCreationDTO.class))
             )
             @RequestBody @Valid SubscriptionCreationDTO subscriptionCreationDTO) {
+
+        System.out.println("Entro al controlador");
+
         ApiResponse<SubscriptionDTO> response = this.subscriptionService.saveSubscription(subscriptionCreationDTO);
         return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatus()));
     }

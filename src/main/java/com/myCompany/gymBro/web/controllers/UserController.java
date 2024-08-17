@@ -79,6 +79,9 @@ public class UserController {
                     content = @Content(schema = @Schema(implementation = UserCreationDTO.class))
             )
             @RequestBody @Valid UserCreationDTO user) {
+
+        System.out.println("Entró al controlador");
+
         ApiResponse<UserSummaryDTO> response = this.userService.saveUser(user);
         return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatus()));
     }

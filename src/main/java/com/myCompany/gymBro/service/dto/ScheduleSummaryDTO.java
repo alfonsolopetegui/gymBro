@@ -6,9 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class ScheduleSummaryDTO {
 
     @Schema(description = "Lista de días en que se realiza la clase", example = "[\"MONDAY\", \"WEDNESDAY\"]")
-    private List<String> days;
+    private List<DayOfWeek> days;
 
     @Schema(description = "Hora de inicio", type = "string", format = "HH:mm:ss", example = "09:00:00")
     private LocalTime startTime;
@@ -26,7 +26,7 @@ public class ScheduleSummaryDTO {
     private LocalTime endTime;
 
     public ScheduleSummaryDTO(ScheduleEntity schedule) {
-        this.days = schedule.getDays().stream().map(day -> day.getDay().toString()).collect(Collectors.toList());
+        this.days = schedule.getDays();
         this.startTime = schedule.getStartTime();
         this.endTime = schedule.getEndTime();
     }

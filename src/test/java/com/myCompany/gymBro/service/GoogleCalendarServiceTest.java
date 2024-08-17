@@ -1,9 +1,7 @@
 package com.myCompany.gymBro.service;
 
 import com.myCompany.gymBro.persistence.entity.ClassEntity;
-import com.myCompany.gymBro.persistence.entity.ScheduleDayEntity;
 import com.myCompany.gymBro.persistence.entity.ScheduleEntity;
-import com.myCompany.gymBro.persistence.enums.DayOfWeek;
 import com.myCompany.gymBro.persistence.repository.GoogleTokenRepository;
 import com.myCompany.gymBro.service.dto.EventDTO;
 import com.myCompany.gymBro.service.dto.RegistrationCreationDTO;
@@ -48,22 +46,13 @@ class GoogleCalendarServiceTest {
         // Crear ScheduleEntity y dependencias
         ScheduleEntity scheduleEntity = new ScheduleEntity();
 
-        ScheduleDayEntity scheduleDayMonday = new ScheduleDayEntity();
-        scheduleDayMonday.setDay(DayOfWeek.MONDAY);
-        scheduleDayMonday.setScheduleDayId(UUID.randomUUID());
-        scheduleDayMonday.setSchedule(scheduleEntity);
-
-        ScheduleDayEntity scheduleDayWednesday = new ScheduleDayEntity();
-        scheduleDayWednesday.setDay(DayOfWeek.WEDNESDAY);
-        scheduleDayWednesday.setScheduleDayId(UUID.randomUUID());
-        scheduleDayWednesday.setSchedule(scheduleEntity);
-
-        List<ScheduleDayEntity> daysList = new ArrayList<>();
-        daysList.add(scheduleDayMonday);
-        daysList.add(scheduleDayWednesday);
 
         List<ScheduleEntity> schedulesList = new ArrayList<>();
         schedulesList.add(scheduleEntity);
+
+        List<DayOfWeek> daysList = new ArrayList<>();
+        daysList.add(DayOfWeek.MONDAY);
+        daysList.add(DayOfWeek.WEDNESDAY);
 
         ClassEntity classEntity = new ClassEntity();
         classEntity.setClassDescription("Description");
@@ -80,8 +69,8 @@ class GoogleCalendarServiceTest {
 
 
         RegistrationCreationDTO registrationCreationDTO = new RegistrationCreationDTO();
-        registrationCreationDTO.setUserId(String.valueOf(UUID.randomUUID()));
-        registrationCreationDTO.setScheduleId(String.valueOf(scheduleEntity.getScheduleId()));
+        registrationCreationDTO.setUserId(UUID.randomUUID());
+        registrationCreationDTO.setScheduleId(scheduleEntity.getScheduleId());
 
 
         // Depuración: Imprimir valores de los objetos antes de llamar al método
@@ -120,9 +109,9 @@ class GoogleCalendarServiceTest {
     @Test
     void calculateOriginalStartDate() {
         // Configurar los días de la semana en que se da la clase
-        List<java.time.DayOfWeek> days = new ArrayList<>();
-        days.add(java.time.DayOfWeek.MONDAY);
-        days.add(java.time.DayOfWeek.WEDNESDAY);
+        List<DayOfWeek> days = new ArrayList<>();
+        days.add(DayOfWeek.MONDAY);
+        days.add(DayOfWeek.WEDNESDAY);
 
         // Configurar la hora de inicio de la clase
         LocalTime time = LocalTime.of(11, 0);

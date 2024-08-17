@@ -19,8 +19,7 @@ public class UserCreationDTO {
     @NotBlank(message = "Este campo no puede estar vacío")
     private String username;
 
-    @NotBlank(message = "Este campo no puede estar vacío")
-    @Email
+    @Email(message = "El formato del mail no es válido")
     private String email;
 
     @NotBlank(message = "Este campo no puede estar vacío")

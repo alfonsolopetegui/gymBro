@@ -9,10 +9,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -34,7 +34,7 @@ public class ScheduleUpdateDTO {
     private LocalTime endTime;
 
     @NotEmpty(message = "Este campo no puede estar vacío")
-    private List<String> days;
+    private List<DayOfWeek> days;
 
     @Min(value = 1, message = "El número máximo de registros debe ser al menos 1")
     private int maxRegistrations;
@@ -42,7 +42,7 @@ public class ScheduleUpdateDTO {
     public ScheduleUpdateDTO(ScheduleEntity schedule) {
         this.scheduleId = schedule.getScheduleId();
         this.classId = schedule.getClassType().getClassId();
-        this.days = schedule.getDays().stream().map(day -> day.getDay().toString()).collect(Collectors.toList());
+        this.days = schedule.getDays();
         this.endTime = schedule.getEndTime();
         this.maxRegistrations = schedule.getMaxRegistrations();
         this.startTime = schedule.getStartTime();

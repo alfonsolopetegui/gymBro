@@ -24,17 +24,16 @@ public class SubscriptionDTO {
     @NotBlank(message = "Este campo ni puede estar vacío")
     private String subscriptionName;
 
-    @NotEmpty(message = "este campo no puede estar vacío")
+    @NotNull(message = "este campo no puede estar vacío")
     private PaymentType subscriptionType;
 
-    @NotEmpty(message = "este campo no puede estar vacío")
     @Positive(message = "el precio debe ser un valor positivo")
     private Double price;
 
     @NotNull(message = "Este campo no puede estar vacío")
     private boolean fullMusculation;
 
-    @NotEmpty(message = "este campo no puede estar vacío")
+    @NotNull(message = "este campo no puede estar vacío")
     private NumberOfClasses numberOfClasses;
 
     @NotNull(message = "Este campo no puede estar vacío")

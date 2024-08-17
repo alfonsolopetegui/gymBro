@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.DayOfWeek;
 import java.util.List;
 
 
@@ -17,7 +18,7 @@ public class EventDTO {
     private EventDateTime start;
     private EventDateTime end;
 
-    private List<String> days;
+    private String days;
 
     @Getter
     @Setter

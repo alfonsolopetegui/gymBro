@@ -39,6 +39,9 @@ public class SecurityConfig {
                 //Personalizacion de la configuración de seguridad
                 .authorizeHttpRequests(customRequest -> {
                     customRequest
+                            .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+                            .requestMatchers("/api/calendar/**").permitAll()
+                            .requestMatchers("/api/oauth2/callback").permitAll()
                             .requestMatchers("/api/auth/**").permitAll()
                             .requestMatchers(HttpMethod.POST, "/api/classes/save").hasRole("ADMIN")
                             .requestMatchers(HttpMethod.PUT, "/api/classes/update").hasRole("ADMIN")

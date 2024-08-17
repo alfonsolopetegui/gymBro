@@ -1,0 +1,29 @@
+# Ignorar archivos de construcción temporales
+*.log
+*.tmp
+
+# Ignorar archivos de sistema y de IDE
+.DS_Store
+.idea/
+*.iws
+*.iml
+*.ipr
+out
+nbproject/private
+nbbuild
+dist
+nbdist
+.nb-gradle
+
+# No ignorar build/libs
+!build/libs/
+
+# Ignorar archivos de credenciales
+credentials.json
+application.properties
+
+# flyctl launch added from .idea\.gitignore
+# Default ignored files
+.idea/shelf
+.idea/workspace.xml
+fly.toml

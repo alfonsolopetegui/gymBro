@@ -3,9 +3,7 @@ package com.myCompany.gymBro.service;
 import com.myCompany.gymBro.exception.CustomClassNotFoundException;
 import com.myCompany.gymBro.exception.ScheduleNotFoundException;
 import com.myCompany.gymBro.persistence.entity.ClassEntity;
-import com.myCompany.gymBro.persistence.entity.ScheduleDayEntity;
 import com.myCompany.gymBro.persistence.entity.ScheduleEntity;
-import com.myCompany.gymBro.persistence.enums.DayOfWeek;
 import com.myCompany.gymBro.persistence.repository.ClassRepository;
 import com.myCompany.gymBro.persistence.repository.ScheduleRepository;
 import com.myCompany.gymBro.service.dto.ScheduleCreationDTO;
@@ -40,51 +38,48 @@ public class ScheduleService {
         return new ApiResponse<>("Se muestra la lista de horarios", 200, scheduleDTOList);
     }
 
+
     public ApiResponse<ScheduleCreationDTO> saveSchedule(ScheduleCreationDTO scheduleCreationDTO) {
 
-        //Valida que UUID sea correcto
-        if (!ValidationUtils.isValidUUID(String.valueOf(scheduleCreationDTO.getClassId()))) {
+        System.out.println("Entro al servicio");
+
+        // Valida que UUID sea correcto
+        UUID classId = scheduleCreationDTO.getClassId();
+        if (!ValidationUtils.isValidUUID(classId.toString())) {
             return new ApiResponse<>("El ID no es un UUID válido", 404, null);
         }
 
-        UUID classId = UUID.fromString(String.valueOf(scheduleCreationDTO.getClassId()));
-
-        //Busca que la clase exista
+        // Busca que la clase exista
         ClassEntity classType = this.classRepository.findById(classId)
                 .orElseThrow(() -> new CustomClassNotFoundException("No existe una clase con ese ID"));
 
         // Validación de tiempos
+        if (scheduleCreationDTO.getStartTime() == null || scheduleCreationDTO.getEndTime() == null) {
+            return new ApiResponse<>("Las horas de inicio y fin no pueden ser nulas", 400, null);
+        }
+
         if (scheduleCreationDTO.getStartTime().isAfter(scheduleCreationDTO.getEndTime())) {
             return new ApiResponse<>("La hora de inicio debe ser anterior a la hora de fin", 400, null);
         }
 
-        //Creo la instancia del Schedule y la asigno los datos
+        // Creo la instancia del Schedule y asigno los datos
         ScheduleEntity scheduleEntity = new ScheduleEntity();
         scheduleEntity.setStartTime(scheduleCreationDTO.getStartTime());
         scheduleEntity.setEndTime(scheduleCreationDTO.getEndTime());
         scheduleEntity.setClassType(classType);
         scheduleEntity.setMaxRegistrations(scheduleCreationDTO.getMaxRegistrations());
         scheduleEntity.setUserRegistrations(new ArrayList<>());
-
-        List<ScheduleDayEntity> scheduleDayEntityList = new ArrayList<>();
-        for (String day : scheduleCreationDTO.getDays()) {
-            ScheduleDayEntity scheduleDayEntity = new ScheduleDayEntity();
-            scheduleDayEntity.setDay(DayOfWeek.valueOf(day));
-            scheduleDayEntity.setSchedule(scheduleEntity);
-            scheduleDayEntityList.add(scheduleDayEntity);
-        }
-
-        scheduleEntity.setDays(scheduleDayEntityList);
+        scheduleEntity.setDays(scheduleCreationDTO.getDays());
 
         try {
             ScheduleEntity savedSchedule = this.scheduleRepository.save(scheduleEntity);
             ScheduleCreationDTO scheduleCreationResponse = new ScheduleCreationDTO(savedSchedule);
             return new ApiResponse<>("Schedule guardado correctamente", 200, scheduleCreationResponse);
         } catch (RuntimeException e) {
-            e.printStackTrace(); // Podrías registrar esto en lugar de imprimir
             return new ApiResponse<>("Error al guardar el schedule", 500, null);
         }
     }
+
 
     public ApiResponse<Void> deleteSchedule (String scheduleId) {
 
@@ -139,15 +134,6 @@ public class ScheduleService {
             return new ApiResponse<>("El número máximo de registros debe ser positivo", 400, null);
         }
 
-        // Validar días de la semana
-        Set<String> validDays = Arrays.stream(DayOfWeek.values())
-                .map(DayOfWeek::name)
-                .collect(Collectors.toSet());
-        for (String day : scheduleUpdateDTO.getDays()) {
-            if (!validDays.contains(day)) {
-                return new ApiResponse<>("Día inválido: " + day, 400, null);
-            }
-        }
 
         UUID scheduleId = UUID.fromString(String.valueOf(scheduleUpdateDTO.getScheduleId()));
         ScheduleEntity existingSchedule = this.scheduleRepository.findById(scheduleId)
@@ -157,14 +143,8 @@ public class ScheduleService {
         ClassEntity classEntity = this.classRepository.findById(classId)
                 .orElseThrow(() -> new CustomClassNotFoundException("La clase que buscas no existe"));
 
-        List<ScheduleDayEntity> scheduleDayEntityList = new ArrayList<>();
-        for (String day : scheduleUpdateDTO.getDays()) {
-            ScheduleDayEntity scheduleDayEntity = new ScheduleDayEntity();
-            scheduleDayEntity.setDay(DayOfWeek.valueOf(day));
-            scheduleDayEntityList.add(scheduleDayEntity);
-        }
 
-        existingSchedule.setDays(scheduleDayEntityList);
+        existingSchedule.setDays(scheduleUpdateDTO.getDays());
         existingSchedule.setClassType(classEntity);
         existingSchedule.setMaxRegistrations(scheduleUpdateDTO.getMaxRegistrations());
         existingSchedule.setStartTime(scheduleUpdateDTO.getStartTime());

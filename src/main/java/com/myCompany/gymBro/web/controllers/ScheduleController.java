@@ -20,7 +20,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/schedules")
 @Tag(name = "Schedule Controller", description = "Operaciones relacionadas con los horarios disponibles a cada clase")
-
 @Validated
 public class ScheduleController {
 
@@ -55,6 +54,8 @@ public class ScheduleController {
                     content = @Content(schema = @Schema(implementation = ScheduleCreationDTO.class))
             )
             @RequestBody @Valid ScheduleCreationDTO scheduleCreationDTO) {
+
+        System.out.println("Entró al controlador");
         ApiResponse<ScheduleCreationDTO> response = this.scheduleService.saveSchedule(scheduleCreationDTO);
         return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatus()));
     }

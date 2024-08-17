@@ -16,6 +16,7 @@ import com.myCompany.gymBro.service.dto.UserSummaryDTO;
 import com.myCompany.gymBro.service.dto.UserUpdateDTO;
 import com.myCompany.gymBro.utils.ValidationUtils;
 import com.myCompany.gymBro.web.response.ApiResponse;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,11 +30,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final SubscriptionRepository subscriptionRepository;
     private final GoogleTokenRepository googleTokenRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, SubscriptionRepository subscriptionRepository, GoogleTokenRepository googleTokenRepository) {
+    public UserService(UserRepository userRepository, SubscriptionRepository subscriptionRepository, GoogleTokenRepository googleTokenRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.subscriptionRepository = subscriptionRepository;
         this.googleTokenRepository = googleTokenRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public ApiResponse<List<UserDetailsDTO>> getAllUsers() {
@@ -109,6 +112,8 @@ public class UserService {
 
     public ApiResponse<UserSummaryDTO> saveUser(UserCreationDTO user) {
 
+        System.out.println("Entro al servicio");
+
         //Valido si el usuario ya existe
         if (this.userRepository.findFirstByEmail(user.getEmail()).isPresent()) {
             return new ApiResponse<>("El email ya existe", 400, null);
@@ -124,8 +129,14 @@ public class UserService {
         UserEntity newUser = new UserEntity();
 
         newUser.setUsername(user.getUsername());
-        newUser.setPassword(user.getPassword());
         newUser.setEmail(user.getEmail());
+
+        // Encriptar la contraseña del usuario antes de guardarla
+        String encryptedPassword = passwordEncoder.encode(user.getPassword());
+
+        System.out.println(encryptedPassword);
+
+        newUser.setPassword(encryptedPassword);
 
         SubscriptionEntity subscription = subscriptionRepository.findById(subscriptionId)
                 .orElseThrow(() -> new SubscriptionNotFoundException("Suscripción no encontrada"));

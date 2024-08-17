@@ -55,19 +55,8 @@ public class SubscriptionService {
         }
 
 
-        if (subscriptionCreationDTO.getSubscriptionName().isEmpty()) {
-            return new ApiResponse<>("EL nombre no puede estar vacío", 404, null);
-        }
-
-
         if (!ValidationUtils.isValidNumberOfClasses(subscriptionCreationDTO.getNumberOfClasses())) {
             return new ApiResponse<>("numberOfClasses no es un valor válido", 404, null);
-        }
-
-
-        // Validar el precio
-        if (subscriptionCreationDTO.getPrice() < 0) {
-            return new ApiResponse<>("El precio no puede ser negativo", 404, null);
         }
 
         try {

@@ -1,11 +1,11 @@
 package com.myCompany.gymBro.persistence.entity;
 
-import com.myCompany.gymBro.persistence.enums.DayOfWeek;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
@@ -40,8 +40,7 @@ public class ScheduleEntity {
     @Column(name = "max_registrations", nullable = false)
     private int maxRegistrations;
 
-    @OneToMany(mappedBy = "schedule", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<ScheduleDayEntity> days;
+    private List<DayOfWeek> days;
 
     public boolean isRegistrationFull() {
         return userRegistrations != null && userRegistrations.size() >= maxRegistrations;
@@ -55,7 +54,7 @@ public class ScheduleEntity {
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
                 ", maxRegistrations=" + maxRegistrations +
-                ", days=" + (days != null ? days.stream().map(ScheduleDayEntity::getDay).toList() : "[]") +
+                ", days=" + (days != null ? days.stream().map(Enum::toString).toList() : "[]") +
                 '}';
     }
 }
